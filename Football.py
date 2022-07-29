@@ -1,7 +1,10 @@
 from random import randint, choice
 from datetime import datetime
+from typing import Literal
+
 from faker import Faker
 from Loggign import setup_logger
+from Errors import *
 
 
 class Human:
@@ -15,10 +18,10 @@ class Human:
 
     @age.setter
     def age(self, age):
-        if Human.age_validator(1, 100, self.age):
+        if Human.age_validator(1, 100, age):
             self._age = age
         else:
-            raise ValueError("Invalid age!")
+            raise HumanAgeError("Invalid age!")
 
     @staticmethod
     def age_validator(min, max, age):
@@ -27,9 +30,11 @@ class Human:
 
         return False
 
+# h1 = Human('a', 50)
+# print(h1.__dict__)
 
 class Player(Human):
-    def __init__(self, name, age, post, salary, rate=0):
+    def __init__(self, name, age, post: Literal['gk', 'lb', 'cb', 'rb', 'cb', 'dmf', 'cm', 'cm', 'acm', 'st', 'cf'], salary, rate=0):
         super().__init__(name, age)
         self.post = post
         self.salary = salary
@@ -43,8 +48,8 @@ class Player(Human):
     def age(self, age):
         if Human.age_validator(15, 30, age):
             self._age = age
-
-        raise ValueError("Invalid age")
+        else:
+            raise PlayerAgeError("Invalid age")
 
     @property
     def rate(self):
@@ -54,7 +59,8 @@ class Player(Human):
     def rate(self, rate):
         if 0 <= rate <= 100:
             self._rate = rate
-        raise ValueError("Invalid rate!")
+        else:
+            raise PlayerRateError("Invalid rate!")
 
     @property
     def salary(self):
@@ -64,8 +70,10 @@ class Player(Human):
     def salary(self, salary):
         if 0 <= salary:
             self._salary = salary
-        raise ValueError("Invalid salary!")
+        else:
+            raise PlayerSalaryError("Invalid salary!")
 
+#p1 = Player('salah', 29, 'cm', 22000, 100)
 
 class Coach(Human):
 
@@ -81,10 +89,10 @@ class Coach(Human):
 
     @age.setter
     def age(self, age):
-        if Human.age_validator(30, 65, self.age):
+        if Human.age_validator(30, 65, age):
             self._age = age
         else:
-            raise ValueError("Invalid age!")
+            raise CoachAgeError("Invalid age!")
 
     @property
     def start_date(self):
@@ -95,8 +103,9 @@ class Coach(Human):
         if start_date >= datetime.now():
             self._start_date = start_date
         else:
-            raise ValueError("Invalid start_date!")
+            raise CoachStartDateError("Invalid start_date!")
 
+c1 = Coach('Jurgen Kloop', 54, 100000, datetime(2022, 10, 26), datetime(2099, 10, 26))
 
 class Team:
     def __init__(self, name, balance, score=0):
@@ -104,6 +113,8 @@ class Team:
         self.balance = balance
         self.score = score
         self.players = Team.people_data_genrator(11)
+        faker = Faker()
+        self.coach = Coach(faker.name(), randint(30, 60), randint(10000, 5000000), datetime(2022, 10, 1), datetime(2027, 10 ,1))
 
     @staticmethod
     def people_data_genrator(x):
@@ -136,6 +147,7 @@ class Team:
     def __lt__(self, other):
         return self.score > other.score
 
+t1 = Team('FC Liverpool', 500000, score= 500)
 
 class League:
     def __init__(self, name):
@@ -168,7 +180,7 @@ class League:
 
     def show_table(self):
 
-        return sorted(self.teams, key= lambda x : x.score)
+        return sorted(self.teams, key=lambda x: x.score)
 
 
 logger_league = setup_logger('league', 'league_logfile.log')

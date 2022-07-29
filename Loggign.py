@@ -1,7 +1,7 @@
 import logging
 
 
-def setup_logger(name, log_file, f = '%(asctime)s %(levelname)s %(message)s', console: bool, level=logging.DEBUG):
+def setup_logger(name, log_file, f = '%(asctime)s %(levelname)s %(message)s', console=False, level=logging.DEBUG):
     handler = logging.FileHandler(log_file)
     handler_formatter = logging.Formatter(f)
     handler.setFormatter(handler_formatter)
